@@ -1,4 +1,4 @@
-name: Build APK
+name: Build PulseVPN APK
 on: [push, workflow_dispatch]
 jobs:
   build:
@@ -14,29 +14,28 @@ jobs:
         run: yes | sdkmanager --licenses || true
       - name: Setup
         run: |
-          mkdir -p app/src/main/java/com/pulsevpn/app app/src/main/res/layout app/src/main/res/values app/src/main/res/drawable gradle/wrapper
+          mkdir -p app/src/main/java/com/pulsevpn/app app/src/main/res/layout app/src/main/res/values app/src/main/res/drawable app/src/main/res/mipmap-hdpi gradle/wrapper
           mv *.java app/src/main/java/com/pulsevpn/app/ 2>/dev/null||true
-          for f in activity_main.xml fragment_home.xml fragment_servers.xml fragment_account.xml fragment_paywall.xml item_server.xml dialog_add_server.xml; do [ -f "$f" ] && cp "$f" app/src/main/res/layout/; done 2>/dev/null||true
-          for f in colors.xml strings.xml themes.xml; do [ -f "$f" ] && cp "$f" app/src/main/res/values/; done 2>/dev/null||true
-          for f in bottom_nav_bg.xml btn_green.xml btn_proto_active.xml btn_proto_inactive.xml card_bg.xml card_selected.xml connect_btn_connected.xml connect_btn_normal.xml custom_card_bg.xml input_bg.xml paywall_feature_bg.xml plan_normal.xml plan_selected.xml premium_card_bg.xml smart_card_bg.xml; do [ -f "$f" ] && cp "$f" app/src/main/res/drawable/; done 2>/dev/null||true
+          for f in activity_main.xml fragment_home.xml fragment_servers.xml fragment_account.xml fragment_paywall.xml item_server.xml dialog_add_server.xml; do [ -f "$f" ] && cp "$f" app/src/main/res/layout/ || true; done
+          for f in bottom_nav_bg.xml btn_green.xml btn_proto_active.xml btn_proto_inactive.xml card_bg.xml card_selected.xml connect_btn_connected.xml connect_btn_normal.xml custom_card_bg.xml input_bg.xml paywall_feature_bg.xml plan_normal.xml plan_selected.xml premium_card_bg.xml smart_card_bg.xml; do [ -f "$f" ] && cp "$f" app/src/main/res/drawable/ || true; done
+          printf '<?xml version="1.0" encoding="utf-8"?>\n<resources>\n<color name="green">#00FF88</color>\n<color name="green_dark">#00994D</color>\n<color name="bg">#050D0F</color>\n<color name="bg3">#0F2328</color>\n<color name="card">#0D1E24</color>\n<color name="text">#E8F5F0</color>\n<color name="text2">#8CA8A0</color>\n<color name="red">#FF4466</color>\n<color name="yellow">#FFCC00</color>\n<color name="gold">#FFD700</color>\n<color name="black">#000000</color>\n<color name="white">#FFFFFF</color>\n<color name="transparent">#00000000</color>\n</resources>' > app/src/main/res/values/colors.xml
+          printf '<?xml version="1.0" encoding="utf-8"?>\n<resources>\n<string name="app_name">PulseVPN</string>\n</resources>' > app/src/main/res/values/strings.xml
+          printf '<?xml version="1.0" encoding="utf-8"?>\n<resources>\n<style name="Theme.PulseVPN" parent="Theme.MaterialComponents.DayNight.NoActionBar">\n<item name="colorPrimary">@color/green</item>\n<item name="colorOnPrimary">@color/black</item>\n<item name="android:colorBackground">@color/bg</item>\n<item name="android:windowBackground">@color/bg</item>\n<item name="android:statusBarColor">@color/bg</item>\n<item name="android:navigationBarColor">@color/bg</item>\n<item name="android:textColorPrimary">@color/text</item>\n<item name="android:windowLightStatusBar">false</item>\n<item name="android:windowLightNavigationBar">false</item>\n</style>\n</resources>' > app/src/main/res/values/themes.xml
           printf '<?xml version="1.0" encoding="utf-8"?>\n<manifest xmlns:android="http://schemas.android.com/apk/res/android">\n<uses-permission android:name="android.permission.INTERNET"/>\n<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>\n<application android:allowBackup="true" android:label="PulseVPN" android:theme="@style/Theme.PulseVPN" android:supportsRtl="true">\n<activity android:name=".MainActivity" android:exported="true" android:screenOrientation="portrait">\n<intent-filter>\n<action android:name="android.intent.action.MAIN"/>\n<category android:name="android.intent.category.LAUNCHER"/>\n</intent-filter>\n</activity>\n</application>\n</manifest>' > app/src/main/AndroidManifest.xml
-          printf 'plugins {\n id "com.android.application"\n}\nandroid {\n namespace "com.pulsevpn.app"\n compileSdk 34\n defaultConfig {\n applicationId "com.pulsevpn.app"\n minSdk 26\n targetSdk 34\n versionCode 1\n versionName "1.0"\n }\n compileOptions {\n sourceCompatibility JavaVersion.VERSION_1_8\n targetCompatibility JavaVersion.VERSION_1_8\n }\n}\ndependencies {\n implementation "androidx.appcompat:appcompat:1.6.1"\n implementation "com.google.android.material:material:1.11.0"\n implementation "androidx.constraintlayout:constraintlayout:2.1.4"\n}' > app/build.gradle
+          printf 'plugins {\n id "com.android.application"\n}\nandroid {\n namespace "com.pulsevpn.app"\n compileSdk 34\n defaultConfig {\n applicationId "com.pulsevpn.app"\n minSdk 26\n targetSdk 34\n versionCode 1\n versionName "1.0"\n }\n compileOptions {\n sourceCompatibility JavaVersion.VERSION_1_8\n targetCompatibility JavaVersion.VERSION_1_8\n }\n}\ndependencies {\n implementation "androidx.appcompat:appcompat:1.6.1"\n implementation "com.google.android.material:material:1.11.0"\n implementation "androidx.constraintlayout:constraintlayout:2.1.4"\n implementation "androidx.coordinatorlayout:coordinatorlayout:1.2.0"\n}' > app/build.gradle
           printf 'plugins {\n id "com.android.application" version "8.2.0" apply false\n}' > build.gradle
           printf 'pluginManagement {\n repositories { google(); mavenCentral(); gradlePluginPortal() }\n}\ndependencyResolutionManagement {\n repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)\n repositories { google(); mavenCentral() }\n}\nrootProject.name = "PulseVPN"\ninclude ":app"' > settings.gradle
           printf 'org.gradle.jvmargs=-Xmx2048m\nandroid.useAndroidX=true\nandroid.enableJetifier=true' > gradle.properties
-          mkdir -p app/src/main/res/values
-          printf '<?xml version="1.0" encoding="utf-8"?>\n<resources>\n<style name="Theme.PulseVPN" parent="Theme.MaterialComponents.DayNight.NoActionBar">\n<item name="colorPrimary">@color/green</item>\n<item name="colorOnPrimary">@color/black</item>\n<item name="android:colorBackground">@color/bg</item>\n<item name="android:windowBackground">@color/bg</item>\n<item name="android:statusBarColor">@color/bg</item>\n<item name="android:navigationBarColor">@color/bg</item>\n<item name="android:textColorPrimary">@color/text</item>\n<item name="android:windowLightStatusBar">false</item>\n<item name="android:windowLightNavigationBar">false</item>\n</style>\n</resources>' > app/src/main/res/values/themes.xml
-          printf '<?xml version="1.0" encoding="utf-8"?>\n<resources>\n<color name="green">#00FF88</color>\n<color name="green_dark">#00994D</color>\n<color name="bg">#050D0F</color>\n<color name="bg3">#0F2328</color>\n<color name="card">#0D1E24</color>\n<color name="text">#E8F5F0</color>\n<color name="text2">#8CA8A0</color>\n<color name="red">#FF4466</color>\n<color name="yellow">#FFCC00</color>\n<color name="gold">#FFD700</color>\n<color name="black">#000000</color>\n<color name="white">#FFFFFF</color>\n<color name="transparent">#00000000</color>\n</resources>' > app/src/main/res/values/colors.xml
-          printf '<?xml version="1.0" encoding="utf-8"?>\n<resources>\n<string name="app_name">PulseVPN</string>\n</resources>' > app/src/main/res/values/strings.xml
           curl -fsSL -o gradle/wrapper/gradle-wrapper.jar https://github.com/gradle/gradle/raw/v8.2.0/gradle/wrapper/gradle-wrapper.jar
-          printf 'distributionBase=GRADLE_USER_HOME\ndistributionPath=wrapper/dists\ndistributionUrl=https\://services.gradle.org/distributions/gradle-8.2-bin.zip\nzipStoreBase=GRADLE_USER_HOME\nzipStorePath=wrapper/dists' > gradle/wrapper/gradle-wrapper.properties
+          printf 'distributionBase=GRADLE_USER_HOME\ndistributionPath=wrapper/dists\ndistributionUrl=https\\://services.gradle.org/distributions/gradle-8.2-bin.zip\nzipStoreBase=GRADLE_USER_HOME\nzipStorePath=wrapper/dists' > gradle/wrapper/gradle-wrapper.properties
           printf '#!/bin/sh\nexec java -cp "$(dirname $0)/gradle/wrapper/gradle-wrapper.jar" org.gradle.wrapper.GradleWrapperMain "$@"' > gradlew
           chmod +x gradlew
-          ls -la && ls app/src/main/
       - name: Build APK
         run: ./gradlew :app:assembleDebug --stacktrace
+      - name: Rename APK
+        run: mv app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/debug/PulseVPN.apk
       - uses: actions/upload-artifact@v4
         with:
-          name: PulseVPN-APK
-          path: app/build/outputs/apk/debug/app-debug.apk
+          name: PulseVPN
+          path: app/build/outputs/apk/debug/PulseVPN.apk
           retention-days: 30
