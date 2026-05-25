@@ -1,8 +1,8 @@
-name: PulseVPN Build (Stable)
+name: PulseVPN Build
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   workflow_dispatch:
 
 jobs:
@@ -22,56 +22,17 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Accept SDK licenses
+      - name: Accept licenses
         run: yes | sdkmanager --licenses || true
 
-      # =========================
-      # GRADLE CACHE (ускорение билдов)
-      # =========================
-      - name: Cache Gradle
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-
-      # =========================
-      # MAKE GRADLE EXECUTABLE
-      # =========================
       - name: Grant permissions
         run: chmod +x gradlew
 
-      # =========================
-      # CHECK PROJECT STRUCTURE
-      # =========================
-      - name: Validate Gradle
-        run: ./gradlew tasks
-
-      # =========================
-      # BUILD DEBUG APK
-      # =========================
       - name: Build Debug APK
         run: ./gradlew assembleDebug --stacktrace
 
-      # =========================
-      # OPTIONAL: BUILD RELEASE (если подпись добавишь)
-      # =========================
-      # - name: Build Release APK
-      #   run: ./gradlew assembleRelease
-
-      # =========================
-      # FIND APK
-      # =========================
-      - name: Locate APK
-        run: find . -type f -name "*.apk"
-
-      # =========================
-      # UPLOAD ARTIFACT
-      # =========================
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: PulseVPN-debug
           path: app/build/outputs/apk/debug/app-debug.apk
-          retention-days: 30
